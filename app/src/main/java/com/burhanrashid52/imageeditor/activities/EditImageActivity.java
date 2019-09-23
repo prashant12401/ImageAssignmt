@@ -81,7 +81,7 @@ public class EditImageActivity extends BaseActivity implements OnPhotoEditorList
     private ConstraintSet mConstraintSet = new ConstraintSet();
     private boolean mIsFilterVisible;
     private String mainImagePath="",mainLoadBy="";
-
+    String exicuteFlag="0";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -237,6 +237,89 @@ public class EditImageActivity extends BaseActivity implements OnPhotoEditorList
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private void saveTempImage(final String options) {
+        if (requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            showLoading("wait...");
+            File file = new File(Environment.getExternalStorageDirectory()
+                    + File.separator + "temp"
+                     + ".png");
+            try {
+                file.createNewFile();
+
+                SaveSettings saveSettings = new SaveSettings.Builder()
+                        .setClearViewsEnabled(true)
+                        .setTransparencyEnabled(true)
+                        .build();
+
+                mPhotoEditor.saveAsFile(file.getAbsolutePath(), saveSettings, new PhotoEditor.OnSaveListener() {
+                    @Override
+                    public void onSuccess(@NonNull String imagePath) {
+
+                       // showSnackbar("Image Saved Successfully");
+
+                        mainImagePath=imagePath;
+                        hideLoading();
+                        //fasflkajskdjfhakusf
+                        mPhotoEditorView.getSource().setImageURI(Uri.fromFile(new File(imagePath)));
+                        switch (options)
+                        {
+                            case "text":
+                                TextEditorDialogFragment textEditorDialogFragment = TextEditorDialogFragment.show(EditImageActivity.this);
+                                textEditorDialogFragment.setOnTextEditorListener(new TextEditorDialogFragment.TextEditor() {
+                                    @Override
+                                    public void onDone(String inputText, int colorCode) {
+                                        final TextStyleBuilder styleBuilder = new TextStyleBuilder();
+                                        styleBuilder.withTextColor(colorCode);
+                                        mPhotoEditorView.setBackgroundResource(R.drawable.image_border_transparent);
+                                        mPhotoEditor.addText(inputText, styleBuilder);
+                                        mTxtCurrentTool.setText(R.string.label_text);
+
+                                    }
+                                });
+                                break;
+                            case "crop":
+                                mTxtCurrentTool.setText(R.string.label_crop);
+                                Bundle bundle = new Bundle();
+                                bundle.putString("filepath", mainImagePath);
+                                if(mainLoadBy.equals("camera"))
+                                {
+                                    bundle.putBoolean("isCamera", true);
+                                }else
+                                {
+                                    bundle.putBoolean("isCamera", false);
+                                }
+                                imageCropFragment2.setArguments(bundle);
+                                imageCropFragment2.show(getSupportFragmentManager(), imageCropFragment2.getTag());
+                                mPhotoEditorView.setBackgroundResource(R.drawable.image_border_transparent);
+                                break;
+                            case "preview":
+                                Bundle bundle2 = new Bundle();
+                                bundle2.putString("filepath", mainImagePath);
+                                mTxtCurrentTool.setText(R.string.label_preview);
+                                previewFragment.setArguments(bundle2);
+                                previewFragment.show(getSupportFragmentManager(), previewFragment.getTag());
+                                mPhotoEditorView.setBackgroundResource(R.drawable.image_border_transparent);
+                                break;
+
+
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        hideLoading();
+                        showSnackbar("Failed to save Image");
+                    }
+                });
+            } catch (IOException e) {
+                e.printStackTrace();
+                hideLoading();
+                showSnackbar(e.getMessage());
+            }
+        }
+    }
+
 
 
     @Override
@@ -357,50 +440,42 @@ public class EditImageActivity extends BaseActivity implements OnPhotoEditorList
 
                 break;
             case TEXT:
+
                 if(validate())
                 {
-                    TextEditorDialogFragment textEditorDialogFragment = TextEditorDialogFragment.show(this);
-                    textEditorDialogFragment.setOnTextEditorListener(new TextEditorDialogFragment.TextEditor() {
-                        @Override
-                        public void onDone(String inputText, int colorCode) {
-                            final TextStyleBuilder styleBuilder = new TextStyleBuilder();
-                            styleBuilder.withTextColor(colorCode);
 
-                            mPhotoEditor.addText(inputText, styleBuilder);
-                            mTxtCurrentTool.setText(R.string.label_text);
-                        }
-                    });
+                    saveTempImage("text");
+
+
+
+
                 }
 
                 break;
             case CROP:
                 //mPhotoEditor.brushEraser();
+
                 if(validate())
                 {
-                    mTxtCurrentTool.setText(R.string.label_crop);
-                    Bundle bundle = new Bundle();
-                    bundle.putString("filepath", mainImagePath);
-                    if(mainLoadBy.equals("camera"))
-                    {
-                        bundle.putBoolean("isCamera", true);
-                    }else
-                    {
-                        bundle.putBoolean("isCamera", false);
-                    }
-                    imageCropFragment2.setArguments(bundle);
-                    imageCropFragment2.show(getSupportFragmentManager(), imageCropFragment2.getTag());
+                    saveTempImage("crop");
+
+
+
+
 
                 }
 
                 break;
             case PREVIEW:
+
+
                 if(validate()) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString("filepath", mainImagePath);
-                    mTxtCurrentTool.setText(R.string.label_preview);
-                    previewFragment.setArguments(bundle);
-                    previewFragment.show(getSupportFragmentManager(), previewFragment.getTag());
-                    break;
+                    saveTempImage("preview");
+
+
+
+
+
                 }
 
 
@@ -471,6 +546,7 @@ public class EditImageActivity extends BaseActivity implements OnPhotoEditorList
     public void fixeFrameChange() {
         mPhotoEditorView.setBackgroundResource(R.drawable.image_border);
 
+
     }
 
 
@@ -480,7 +556,7 @@ public class EditImageActivity extends BaseActivity implements OnPhotoEditorList
 
         ///   String filename = photoPath.substring(photoPath.lastIndexOf("/") + 1);
         Helper.setImageToImageView(mPhotoEditorView, path);
-        mainImagePath=path;
+
     }
 
     //On click download button

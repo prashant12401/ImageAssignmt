@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.burhanrashid52.imageeditor.R;
 import com.burhanrashid52.imageeditor.model.User;
 import com.burhanrashid52.imageeditor.utils.DatabaseClient;
+import com.burhanrashid52.imageeditor.utils.Helper;
 
 import java.io.File;
 
@@ -62,6 +63,10 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
         if(TextUtils.isEmpty(etEmailAddress.getText().toString()))
         {
             Toast.makeText(this, "Please enter email address", Toast.LENGTH_SHORT).show();
+            return false;
+        }else if(!Helper.isValidMail(etEmailAddress.getText().toString()))
+        {
+            Toast.makeText(this, "Please enter valid email", Toast.LENGTH_SHORT).show();
             return false;
         }else if(TextUtils.isEmpty(etFullName.getText().toString()))
         {

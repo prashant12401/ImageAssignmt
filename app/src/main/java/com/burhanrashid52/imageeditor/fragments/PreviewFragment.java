@@ -124,6 +124,7 @@ public class PreviewFragment extends BottomSheetDialogFragment  {
         btnPlaceOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 Intent i_placeOrder=new Intent(getActivity(), OrderActivity.class);
                 i_placeOrder.putExtra("filepath",filePath);
                 getActivity().startActivity(i_placeOrder);

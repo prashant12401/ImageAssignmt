@@ -26,6 +26,7 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import ja.burhanrashid52.photoeditor.PhotoEditorView;
 
@@ -38,6 +39,14 @@ public class Helper {
 //
 
 
+    public final static Pattern EMAIL_ADDRESS_PATTERN = Pattern
+            .compile("[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" + "\\@"
+                    + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" + "(" + "\\."
+                    + "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" + ")+");
+
+    public static boolean isValidMail(String email) {
+        return EMAIL_ADDRESS_PATTERN.matcher(email).matches();
+    }
 
 
     public static void setMarquee(TextView tv) {
