@@ -159,7 +159,7 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
                           final String address) {
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
         emailIntent.setType("application/image");
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {"pmmprashant961@gmail.com"});
+        emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {" sagar@solacetechnologies.co.in"});
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Application testing of image crop");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "Email :"+emailAddress+" fullName :"+fullName
         +" mobileNumber:"+mobileNumber+" Address:"+address);
