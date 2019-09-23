@@ -76,6 +76,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textSize="16sp"
+                    android:text="@string/save"
+                    android:padding="10dp"
+                    android:layout_gravity="center"
+                    android:id="@+id/btnSave"/>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
                     android:text="@string/submit"
                     android:padding="10dp"
                     android:layout_gravity="center"

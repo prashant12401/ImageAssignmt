@@ -25,7 +25,7 @@ import java.io.File;
 public class OrderActivity extends AppCompatActivity implements View.OnClickListener {
     ImageView ivFinalImage;
     EditText etEmailAddress,etFullName,etMobileNo,etAddress;
-    Button btnSubmit;
+    Button btnSubmit,btnSave;
     String filePath="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,7 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
         etMobileNo=findViewById(R.id.etMobileNo);
         etAddress=findViewById(R.id.etAddress);
         btnSubmit=findViewById(R.id.btnSubmit);
+        btnSave=findViewById(R.id.btnSave);
 
         //set image using file path
         if (null!=getIntent().getStringExtra("filepath")) {
@@ -54,6 +55,7 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
 
         }
 
+        btnSave.setOnClickListener(this);
         btnSubmit.setOnClickListener(this);
     }
 
@@ -90,18 +92,29 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View view) {
-
-        if(validate())
+        final String emailAddress = etEmailAddress.getText().toString().trim();
+        final String fullName = etFullName.getText().toString().trim();
+        final String mobileNumber = etMobileNo.getText().toString().trim();
+        final String address = etAddress.getText().toString().trim();
+        switch (view.getId())
         {
-            final String emailAddress = etEmailAddress.getText().toString().trim();
-            final String fullName = etFullName.getText().toString().trim();
-            final String mobileNumber = etMobileNo.getText().toString().trim();
-            final String address = etAddress.getText().toString().trim();
+            case R.id.btnSave:
 
-            saveTask(emailAddress,fullName,mobileNumber,address);
+                if(validate()) {
 
+                    saveTask(emailAddress,fullName,mobileNumber,address);
+                }
 
+                break;
+            case R.id.btnSubmit:
+
+                if(validate()) {
+
+                    sendMail(emailAddress,fullName,mobileNumber,address);
+                }
+                break;
         }
+
     }
 
 
@@ -131,7 +144,7 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
             @Override
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
-                sendMail(emailAddress,fullName,mobileNumber,address);
+
 
                 Toast.makeText(getApplicationContext(), "Saved", Toast.LENGTH_LONG).show();
             }
@@ -145,24 +158,25 @@ public class OrderActivity extends AppCompatActivity implements View.OnClickList
     private void sendMail(final String emailAddress, final String fullName, final String mobileNumber,
                           final String address) {
         Intent emailIntent = new Intent(Intent.ACTION_SEND);
-        emailIntent.setType("text/plain");
+        emailIntent.setType("application/image");
         emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {"pmmprashant961@gmail.com"});
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Application testing of image crop");
         emailIntent.putExtra(Intent.EXTRA_TEXT, "Email :"+emailAddress+" fullName :"+fullName
         +" mobileNumber:"+mobileNumber+" Address:"+address);
-        File root = Environment.getExternalStorageDirectory();
-        String pathToMyAttachedFile = filePath;
-        String filename=pathToMyAttachedFile.substring(pathToMyAttachedFile.lastIndexOf("/")+1);
-        File filelocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), filename);
-        Uri path = Uri.fromFile((filelocation));
+//        File root = Environment.getExternalStorageDirectory();
+//        String pathToMyAttachedFile = filePath;
+//        String filename=pathToMyAttachedFile.substring(pathToMyAttachedFile.lastIndexOf("/")+1);
+//        File filelocation = new File(Environment.getExternalStorageDirectory().getAbsolutePath(), filename);
+//        Uri path = Uri.fromFile((filelocation));
         /*if (!file.exists() || !file.canRead()) {
             return;
         }*/
        // Uri uri = Uri.fromFile(file);
-        emailIntent.putExtra(Intent.EXTRA_STREAM, path);
-        startActivity(Intent.createChooser(emailIntent, "Pick an Email provider"));
-        finish();
+        emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(filePath));
+//        emailIntent.putExtra(Intent.EXTRA_STREAM, path);
+        startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+     //   finish();
 
-        startActivity(new Intent(getApplicationContext(), EditImageActivity.class));
+        //startActivity(new Intent(getApplicationContext(), EditImageActivity.class));
     }
 }
